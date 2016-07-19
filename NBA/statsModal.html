@@ -1,0 +1,84 @@
+﻿
+<div class="modal-header">
+        <nav class="navbar navbar-default">
+            <div class="navbar-header">
+                <a class="brand" style="margin: 10px;">
+                    <img alt="Brand" style="margin-top:3px !important;" src="./Images/nba.jpg">
+                </a>
+            </div>
+            <div class="container-fluid">
+                <p class="navbar-text">NBA Player Predictions  <span ng-show="finished">- Games Against: <b>{{Opposition}}</b> {{l}} <b>{{Location}}</b> </span> </p>
+                <form class="navbar-form navbar-right" style="margin-right:10px" role="search">
+                    <div class="form-group has-feedback">
+                        <input type="text" class="form-control" ng-model="Opposition" placeholder="vs Team" />
+                        <i class="glyphicon glyphicon-user form-control-feedback"></i>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="text" class="form-control" placeholder="Home or Road" ng-model="Location" />
+                        <i class="glyphicon glyphicon-globe form-control-feedback" tooltip="Home or Road"></i>
+                    </div>
+                    <button type="submit"class="btn btn-default" ng-click="search()">Go</button>
+                </form>
+            </div>
+        </nav>
+
+</div>
+
+</div>
+<div class="modal-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2">
+                        <div>{{PlayerName}}</div>
+                           <div> <img src=./Images/players/{{PlayerId}}.png /> </div>                      
+                 </div>
+			 <div class="col-md-10">
+			       <div class="col-mid-3" ng-show="notenoughgames || gamesPlayed < 2">
+						<h4><span class="label label-warning">WARNING: Player has not played enough games against <b>{{Opposition}}</b> </span></h4>
+						 
+						 <div class="form-group has-feedback">
+									 <input type="text" class="form-control input-sm" ng-model="margin"/> 
+									  <i class="glyphicon glyphicon-stats form-control-feedback" tooltip="Home or Road"></i>
+								 </div>
+						 <button type="Calculate"class="btn btn-default pull-right" ng-click="calcLittleInfo(PlayerId)">Predict Anyway</button>
+						
+						
+					</div>
+				  <table st-table="statsResults" class="table table-hover">
+					<thead>
+					<tr> <th colspan="8" ng-show="finished"> Games Played: {{gamesPlayed}} </th> </tr>
+					<tr>
+						<th ng-repeat="header in headers.slice(18,27)">
+								   {{header}}
+						</th>
+						<th ng-show="finished"> Sportsbet Margin </th>
+					   </tr>
+					</thead>
+					<tbody>
+					  <tr ng-repeat="d in playerInfoBody track by $index">
+							<td ng-repeat="a in d.slice(18,27) track by $index">
+								{{a}}
+							</td>
+							<td>
+						    <form>
+								 <div class="form-group has-feedback">
+									 <input type="text" class="form-control input-sm" ng-model="margin"/> 
+									  <i class="glyphicon glyphicon-stats form-control-feedback" tooltip="Home or Road"></i>
+								 </div>
+								  <button type="Calculate"class="btn btn-default pull-right" ng-click="calc(d)">Predict</button>
+							</form>
+						  </td>
+					  </tr>
+					  </tbody>
+				</table>
+			</div>
+            </div>
+			  
+				
+				
+        </div>
+   </div>
+</div>
+<div class="modal-footer modalFooterColor">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+</div>
