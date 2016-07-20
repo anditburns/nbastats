@@ -33,15 +33,8 @@
                  </div>
 			 <div class="col-md-10">
 			       <div class="col-mid-3" ng-show="notenoughgames || gamesPlayed < 2">
-						<h4><span class="label label-warning">WARNING: Player has not played enough games against <b>{{Opposition}}</b> </span></h4>
+						<h4><span class="label label-warning">CAUTION!: Player has not played enough games against <b>{{Opposition}}</b> </span></h4>
 						 
-						 <div class="form-group has-feedback">
-									 <input type="text" class="form-control input-sm" ng-model="margin2"/> 
-									  <i class="glyphicon glyphicon-stats form-control-feedback" tooltip="Home or Road"></i>
-								 </div>
-						 <button type="Calculate"class="btn btn-default pull-right" ng-click="calcLittleInfo(PlayerId)">Predict Anyway</button>
-						
-						
 					</div>
 				  <table st-table="statsResults" class="table">
 					<thead>
