@@ -25,18 +25,29 @@
         });
     }
 	
-	APIService.GetLastNGames = function ($scope) {
+	APIService.GetGamesVsTeam = function ($scope) {
         return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
-            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:$scope.Location,Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:$scope.OpponentTeamID,VsConference:'',VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'82', callback:'JSON_CALLBACK'}
-        
+            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:$scope.OpponentTeamID,VsConference:'',VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'82', callback:'JSON_CALLBACK'}
 		});
     }
+	
+	APIService.GetGamesVsConference = function ($scope) {
+        return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
+            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:$scope.Location,Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:0,VsConference:$scope.OpponentConference,VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'82', callback:'JSON_CALLBACK'}
+		});
+    }
+	
+	APIService.GetGamesInMonth = function ($scope) {
+        return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
+            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:$scope.Location,Month:$scope.Month,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:0,VsConference:$scope.OpponentConference,VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'82', callback:'JSON_CALLBACK'}
+		});
+    }
+	
 	
 	APIService.GetTeams = function(){
 		return $http.get('Data/teams.json').success(function(data) {
          });
 	}
-	
 	
     return APIService;
 }]);
@@ -70,13 +81,10 @@ app.controller('SearchLogController', function ($scope, APIService, $uibModal)
                 }
             }
         });
-    };
-	
-			
+    };	
 });
 
 app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, items, APIService) {
-
     $scope.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
@@ -85,6 +93,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 	$scope.PlayerId = items[0];
 	$scope.TeamIdPlayer = items[3];
 	$scope.OpponentTeamID = '';
+
 	
 	$scope.search = function () {
 		var found = false;
@@ -103,7 +112,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 			
 		}).then(function ()
 		{
-			APIService.GetLastNGames($scope)
+			APIService.GetGamesVsTeam($scope)
 				.success(function (data) 
 				{		
 					if (data == null || data.resultSets[0].rowSet.length == 0) {				
@@ -113,7 +122,6 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 						$scope.headers = data.resultSets[1].headers;
 						$scope.playerInfoBody = data.resultSets[0].rowSet;	
 						$scope.gamesPlayed = data.resultSets[0].rowSet[0][2]
-						
 						
 						if($scope.Location == "Home"){
 							$scope.l = "@";
@@ -130,12 +138,77 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 	}
 	
 	
-	$scope.calc = function (data){
+	$scope.predict = function (vteamstats,margin){
+		var d = new Date();
+		$scope.Month = d.getMonth()+1;
+		//$scope.Month = 11;
+		//if($scope.Month == 13){
+		//	$scope.Month = 1;
+		//}
+		var found = false;
+		$scope.OpponentConference = '';
+		$scope.predictionMade = false;
 		
-		alert(JSON.stringify(data));
+		var pointsAgainstTeam = vteamstats[26];
+		var pointsAgainstConference = 0;
+		var pointsInMonth = 0;
 		
-	}
-
+		APIService.GetTeams()
+		.success(function (teams)
+		{
+		   angular.forEach(teams, function (value, key) {
+			   if(!found){
+				   if(value["simpleName"] == $scope.Opposition){
+					   $scope.OpponentConference = value["conf"];
+					   found = true;
+				   }
+			   }	
+		   });
+		}).then(function ()
+		{
+				APIService.GetGamesVsConference($scope)
+				.success(function (data)
+				{
+					if (data == null || data.resultSets[0].rowSet.length == 0) {				
+								//$scope.notenoughgames = true;
+								//$scope.searchResults = null;
+					}
+					else
+					{
+						pointsAgainstConference = data.resultSets[0].rowSet[0][26];
+					}				
+				})
+		
+		}).then(function ()
+		{
+			APIService.GetGamesInMonth($scope)
+				.success(function (data)
+				{
+					if (data == null || data.resultSets[0].rowSet.length == 0) {				
+								//$scope.notenoughgames = true;
+								//$scope.searchResults = null;
+					}
+					else
+					{
+						var pointsInMonth = data.resultSets[0].rowSet[0][26];
+						var pointsAverage = (pointsAgainstTeam + pointsAgainstConference + pointsInMonth) / 3;
+						$scope.PredictedScore =  Math.round(pointsAverage);
+						
+						if($scope.PredictedScore > margin){
+								$scope.PlusMinus = Math.round((Math.round(pointsAverage) / parseInt(margin)) * 100);
+						}
+						else {
+								$scope.PlusMinus = Math.round((parseInt(margin) / Math.round(pointsAverage)) * 100);
+						}
+						$scope.predictionMade = true;
+					}				
+				})
+				
+		});
+	
+	
      $scope.vsteam = $scope.Opposition;		
+
+	};
 
 });

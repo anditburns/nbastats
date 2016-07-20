@@ -24,7 +24,6 @@
 
 </div>
 
-</div>
 <div class="modal-body">
         <div class="container-fluid">
             <div class="row">
@@ -37,14 +36,14 @@
 						<h4><span class="label label-warning">WARNING: Player has not played enough games against <b>{{Opposition}}</b> </span></h4>
 						 
 						 <div class="form-group has-feedback">
-									 <input type="text" class="form-control input-sm" ng-model="margin"/> 
+									 <input type="text" class="form-control input-sm" ng-model="margin2"/> 
 									  <i class="glyphicon glyphicon-stats form-control-feedback" tooltip="Home or Road"></i>
 								 </div>
 						 <button type="Calculate"class="btn btn-default pull-right" ng-click="calcLittleInfo(PlayerId)">Predict Anyway</button>
 						
 						
 					</div>
-				  <table st-table="statsResults" class="table table-hover">
+				  <table st-table="statsResults" class="table">
 					<thead>
 					<tr> <th colspan="8" ng-show="finished"> Games Played: {{gamesPlayed}} </th> </tr>
 					<tr>
@@ -65,20 +64,26 @@
 									 <input type="text" class="form-control input-sm" ng-model="margin"/> 
 									  <i class="glyphicon glyphicon-stats form-control-feedback" tooltip="Home or Road"></i>
 								 </div>
-								  <button type="Calculate"class="btn btn-default pull-right" ng-click="calc(d)">Predict</button>
+								  <button type="Calculate"class="btn btn-default pull-right" ng-click="predict(d,margin)">Predict</button>
 							</form>
 						  </td>
+						  
 					  </tr>
 					  </tbody>
 				</table>
-			</div>
-            </div>
-			  
+			</div>	
+           </div>
+		       <div class="row">
+			     <div class="col-md-3 pull-right">
+					  <span ng-show="predictionMade" class="pull-right">
+								<h4> Score Predicted: {{PredictedScore}} +/- {{PlusMinus}}%</h4>
+							</span>			
+			  </div>
+			 </div>
 				
 				
         </div>
-   </div>
-</div>
+  </div>
 <div class="modal-footer modalFooterColor">
     <button class="btn btn-default" ng-click="cancel()">Close</button>
 </div>
