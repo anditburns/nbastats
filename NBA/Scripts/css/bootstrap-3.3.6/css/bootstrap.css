@@ -1605,7 +1605,7 @@ pre code {
   }
 }
 .container-fluid {
-  padding-right: 15px;
+  padding-right: 1px;
   padding-left: 15px;
   margin-right: auto;
   margin-left: auto;
@@ -5938,6 +5938,7 @@ button.close {
 .modal-header {
   padding: 15px;
   border-bottom: 1px solid #e5e5e5;
+  height:90px;
 }
 .modal-header .close {
   margin-top: -2px;

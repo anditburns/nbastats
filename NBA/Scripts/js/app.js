@@ -6,9 +6,9 @@
 
     var APIService = {};
 
-	APIService.GetCommonPlayerInfo = function ($scope) {
+	APIService.GetCommonPlayerInfo = function (playerId) {
         return $http.jsonp(urlBase + '/commonplayerinfo', {
-            params: {PlayerID: $scope.PlayerID, callback:'JSON_CALLBACK'}
+            params: {PlayerID: playerId, callback:'JSON_CALLBACK'}
         });
 	}
 	
@@ -92,8 +92,24 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
     $scope.finished = false;
 	$scope.PlayerId = items[0];
 	$scope.TeamIdPlayer = items[3];
+	$scope.teamname = items[11];
 	$scope.OpponentTeamID = '';
-
+	$scope.PlayerName = items[2];
+	
+	GetCommonPlayerInfo();
+	
+		
+	function GetCommonPlayerInfo(){
+		
+		APIService.GetCommonPlayerInfo(items[0])
+		.success(function (data)
+		{
+			$scope.JerseyNum =  data.resultSets[0].rowSet[0][13];	
+			$scope.Position = data.resultSets[0].rowSet[0][14];	
+			$scope.CareerPointsAvg = data.resultSets[1].rowSet[0][3];
+		});			
+		
+	}
 	
 	$scope.search = function () {
 		var found = false;
@@ -135,10 +151,12 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 				})
 			
 		});
+
 	}
 	
 	
-	$scope.predict = function (vteamstats,margin){
+	$scope.predict = function (vteamstats,margin)
+	{
 		var d = new Date();
 		$scope.Month = d.getMonth()+1;
 		//$scope.Month = 11;
@@ -194,11 +212,11 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 						var pointsAverage = (pointsAgainstTeam + pointsAgainstConference + pointsInMonth) / 3;
 						$scope.PredictedScore =  Math.round(pointsAverage);
 						
-						if($scope.PredictedScore > parseInt(margin)){
-								$scope.PlusMinus = Math.round((Math.round(pointsAverage) / parseInt(margin)) * 100);
+						if($scope.PredictedScore >= parseInt(margin)){
+							$scope.PlusMinus = Math.round((parseInt(margin) / Math.round(pointsAverage)) * 100);
 						}
 						else {
-								$scope.PlusMinus = Math.round((parseInt(margin) / Math.round(pointsAverage)) * 100);
+							$scope.PlusMinus = Math.round((Math.round(pointsAverage) / parseInt(margin)) * 100);
 						}
 						
 						$scope.predictionMade = true;
@@ -207,5 +225,6 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 				
 		});
 	};
+	
 
 });

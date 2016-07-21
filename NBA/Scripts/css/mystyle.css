@@ -54,7 +54,7 @@
   background-color: #E13A3E;
 }
 .modalFooterColor {
-	background-color: #007DC5;
+	background-color: #0065B5;
 }
 
 
@@ -66,6 +66,11 @@
 
 .center {
     text-align: center;
+}
 
+/* navbar */
+.navbar-default-modal {
+    background-color: #FFFFFF;
+    border-color: #FFFFFF;
 }
 

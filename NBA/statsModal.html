@@ -1,9 +1,9 @@
 ﻿
 <div class="modal-header">
-        <nav class="navbar navbar-default">
+        <nav class="navbar navbar-default-modal style=background-color:#FFFFFF">
             <div class="navbar-header">
-                <a class="brand" style="margin: 10px;">
-                    <img alt="Brand" style="margin-top:3px !important;" src="./Images/nba.jpg">
+                <a class="brand" style="margin: 5px;">
+                    <img alt="{{teamname}}" style="margin-top:3px !important;" src='./Images/teams/{{teamname}}.png'>
                 </a>
             </div>
             <div class="container-fluid">
@@ -28,8 +28,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-2">
-                        <div>{{PlayerName}}</div>
-                           <div> <img src=./Images/players/{{PlayerId}}.png /> </div>                      
+                           <div> <img src='./Images/players/{{PlayerId}}.png' /> </div>                      
                  </div>
 			 <div class="col-md-10">
 			       <div class="col-mid-3" ng-show="notenoughgames || gamesPlayed < 2">
@@ -72,11 +71,11 @@
 								<h4> Score Predicted: {{PredictedScore}} +/- {{PlusMinus}}%</h4>
 							</span>			
 			  </div>
-			 </div>
-				
-				
+			 </div>	
         </div>
   </div>
 <div class="modal-footer modalFooterColor">
+	<div style="float:left;color:#FFFFFF;line-height:34px;"><strong>{{PlayerName}} - #{{JerseyNum}} - {{Position}}</strong> | <strong> Career Average: {{CareerPointsAvg}} </strong></div>
+	
     <button class="btn btn-default" ng-click="cancel()">Close</button>
 </div>
