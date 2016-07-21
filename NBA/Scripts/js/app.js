@@ -27,28 +27,26 @@
 	
 	APIService.GetGamesVsTeam = function ($scope) {
         return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
-            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:$scope.OpponentTeamID,VsConference:'',VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'82', callback:'JSON_CALLBACK'}
+            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:$scope.OpponentTeamID,VsConference:'',VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'0', callback:'JSON_CALLBACK'}
 		});
     }
 	
 	APIService.GetGamesVsConference = function ($scope) {
         return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
-            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:0,VsConference:$scope.OpponentConference,VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'20', callback:'JSON_CALLBACK'}
+            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:0,VsConference:$scope.OpponentConference,VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:0, callback:'JSON_CALLBACK'}
 		});
     }
-	
-	APIService.GetLastTenGames = function ($scope) {
-        return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
-            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:$scope.PlayerId,Outcome:'',Location:$scope.Location,Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:0,VsConference:'',VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'10', callback:'JSON_CALLBACK'}
-		});
-    }
-	
 	
 	APIService.GetTeams = function(){
 		return $http.get('Data/teams.json').success(function(data) {
          });
 	}
 	
+	APIService.GetGlobalNBAStats = function (playername){
+			return  $http.get('http://au.global.nba.com/stats2/player/stats.json?ds=splits&locale=au&playerCode='+playername).success(function(data){
+				//params:{ds:'splits', locale:'au', playerCode:player, callback:'JSON_CALLBACK'}
+		});
+	}
     return APIService;
 }]);
 
@@ -95,10 +93,10 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 	$scope.teamname = items[11];
 	$scope.OpponentTeamID = '';
 	$scope.PlayerName = items[2];
+	$scope.playername_ = items[6];
 	
 	GetCommonPlayerInfo();
 	
-		
 	function GetCommonPlayerInfo(){
 		
 		APIService.GetCommonPlayerInfo(items[0])
@@ -108,7 +106,6 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 			$scope.Position = data.resultSets[0].rowSet[0][14];	
 			$scope.CareerPointsAvg = data.resultSets[1].rowSet[0][3];
 		});			
-		
 	}
 	
 	$scope.search = function () {
@@ -124,8 +121,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 				   }
 			   }
 		   });
-	
-			
+
 		}).then(function ()
 		{
 			APIService.GetGamesVsTeam($scope)
@@ -133,6 +129,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 				{		
 					if (data == null || data.resultSets[0].rowSet.length == 0) {				
 						$scope.notenoughgames = true;
+						$scope.nogamesagainstopponent = true;
 						//$scope.searchResults = null;
 					} else {
 						$scope.headers = data.resultSets[1].headers;
@@ -153,63 +150,71 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 		});
 
 	}
-	
-	
+
 	$scope.predict = function (vteamstats,margin)
 	{
-		var d = new Date();
-		$scope.Month = d.getMonth()+1;
-		//$scope.Month = 11;
-		//if($scope.Month == 13){
-		//	$scope.Month = 1;
-		//}
-		var found = false;
-		$scope.OpponentConference = '';
 		$scope.predictionMade = false;
 		
-		var pointsAgainstTeam = parseInt(vteamstats[26]);
-		var pointsAgainstConference = 0;
-		var pointsInMonth = 0;
+		$scope.pointsAgainstTeam = parseInt(vteamstats[26]);
 		
-		APIService.GetTeams()
-		.success(function (teams)
-		{
-		   angular.forEach(teams, function (value, key) {
-			   if(!found){
-				   if(value["simpleName"] == $scope.Opposition){
-					   $scope.OpponentConference = value["conf"];
-					   found = true;
-				   }
-			   }	
-		   });
-		}).then(function ()
-		{
-				APIService.GetGamesVsConference($scope)
-				.success(function (data)
+		GetGamesAgainstConference($scope);
+
+		function GetGamesAgainstConference($scope){
+			var found = false;
+				APIService.GetTeams()
+				.success(function (teams)
 				{
-					if (data == null || data.resultSets[0].rowSet.length == 0) {				
-								//$scope.notenoughgames = true;
-								//$scope.searchResults = null;
-					}
-					else
-					{
-						pointsAgainstConference = data.resultSets[0].rowSet[0][26];
-					}				
-				})
-		
-		}).finally(function ()
-		{
-			APIService.GetLastTenGames($scope)
-				.success(function (data)
+				   angular.forEach(teams, function (value, key) {
+					   if(!found){
+						   if(value["simpleName"] == $scope.Opposition){
+							   $scope.OpponentConference = value["conf"];
+							   found = true;
+						   }
+					   }	
+				   });
+				}).then(function ()
 				{
-					if (data == null || data.resultSets[0].rowSet.length == 0) {				
-								//$scope.notenoughgames = true;
-								//$scope.searchResults = null;
-					}
-					else
+					APIService.GetGamesVsConference($scope)
+					 .success(function (data) 
+					{		
+						if (data == null || data.resultSets[0].rowSet.length == 0) {				
+							$scope.pointsAgainstConference = 0;
+						}
+						else
+						{
+							$scope.pointsAgainstConference = data.resultSets[0].rowSet[0][26];
+							Calculate($scope);
+						}				
+					})
+				
+				});
+		}
+		function Calculate($scope)
+		{
+			APIService.GetGlobalNBAStats($scope.playername_)
+			.success(function (data) 
+			{		
+					if(data.payload.player.stats.playerSplit.splits.length > 0)  
 					{
-						var pointsInMonth = data.resultSets[0].rowSet[0][26];
-						var pointsAverage = (pointsAgainstTeam + pointsAgainstConference + pointsInMonth) / 3;
+						var seasonAvg = data.payload.leagueSeasonAverage['pointsPg']; // we will sub this in if any stats come back empty
+						var last5Games = data.payload.player.stats.playerSplit.splits[14].statAverage['pointsPg'];
+						var inCurrentMonth = data.payload.player.stats.playerSplit.splits[15].statAverage['pointsPg'];
+						var inPreviousMonth = data.payload.player.stats.playerSplit.splits[8].statAverage['pointsPg'];
+						var onTheRoadAvg = data.payload.player.stats.playerSplit.splits[16].statAverage['pointsPg'];
+						var atHome = data.payload.player.stats.playerSplit.splits[12].statAverage['pointsPg'];
+						var homeorroad = 0;
+						
+						if($scope.Location == "Home")
+						{
+							homeorroad = atHome;
+						}
+						else
+						{
+							homeorroad = onTheRoadAvg;
+						}
+						
+						var pointsAverage = ($scope.pointsAgainstTeam + $scope.pointsAgainstConference + last5Games + homeorroad) / 4;
+						
 						$scope.PredictedScore =  Math.round(pointsAverage);
 						
 						if($scope.PredictedScore >= parseInt(margin)){
@@ -218,13 +223,22 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 						else {
 							$scope.PlusMinus = Math.round((Math.round(pointsAverage) / parseInt(margin)) * 100);
 						}
-						
+					
 						$scope.predictionMade = true;
-					}				
-				})
-				
-		});
-	};
-	
+					}
+					else
+					{
+						$scope.notenoughgames = false;
+						$scope.nodata = true;
+						$scope.error = "Player has no data to predict with";
+					}
+					
+			}).error(function (e) {
+				$scope.notenoughgames = false;
+				$scope.nodata = true;
+				$scope.error = "Something went wrong: Player probable has limited data to work with" + e;
+			});		
 
+		}	
+	}
 });

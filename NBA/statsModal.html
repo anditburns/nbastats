@@ -31,10 +31,19 @@
                            <div> <img src='./Images/players/{{PlayerId}}.png' /> </div>                      
                  </div>
 			 <div class="col-md-10">
-			       <div class="col-mid-3" ng-show="notenoughgames || gamesPlayed < 2">
+			       <h4 ng-show="nodata"><span class="label label-danger pull-right"><b>{{error}}</b> </span></h4>
+			       <div class="col-mid-3 pull-right" ng-show="notenoughgames">
 						<h4><span class="label label-warning">CAUTION!: Player has not played enough games against <b>{{Opposition}}</b> </span></h4>
-						 
-					</div>
+						  
+						<div ng-show="nogamesagainstopponent">  
+							<div class="form-group has-feedback">
+									<input type="text" class="form-control input-sm" ng-model="margin"/> 
+									<i class="glyphicon glyphicon-stats form-control-feedback" tooltip="Home or Road"></i>
+							 </div>
+									  <button type="Calculate"class="btn btn-default pull-right" ng-click="predict('',margin)">Predict</button>
+
+						</div>	
+				  </div>
 				  <table st-table="statsResults" class="table">
 					<thead>
 					<tr> <th colspan="8" ng-show="finished"> Games Played: {{gamesPlayed}} </th> </tr>
