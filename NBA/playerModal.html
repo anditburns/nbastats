@@ -7,7 +7,7 @@
                 </a>
             </div>
             <div class="container-fluid">
-                <p class="navbar-text">NBA Player Predictions  <span ng-show="finished">- Games Against: <b>{{Opposition}}</b> {{l}} <b>{{Location}}</b> </span> </p>
+                <p class="navbar-text">NBA Player Predictions by Player <span ng-show="finished">- Game Against: <b>{{Opposition}}</b> {{l}} <b>{{Location}}</b> </span> </p>
                 <form class="navbar-form navbar-right" style="margin-right:10px" role="search">
                     <div class="form-group has-feedback">
                         <input type="text" class="form-control" ng-model="Opposition" placeholder="vs Team" />
@@ -65,7 +65,7 @@
 									 <input type="text" class="form-control input-sm" ng-model="margin"/> 
 									  <i class="glyphicon glyphicon-stats form-control-feedback" tooltip="Home or Road"></i>
 								 </div>
-								  <button type="Calculate"class="btn btn-default pull-right" ng-click="predict(d,margin)">Predict</button>
+								  <button type="Calculate"class="btn btn-default pull-right" ng-click="predict(d,margin,PlayerId,Opposition,Location)">Predict</button>
 							</form>
 						  </td>
 						  

@@ -29,19 +29,26 @@
 			  <table class="table table-hover">
                 <thead>
 				  <tr>
-					<th> Player ID </th>
 					<th> Player Name </th>
 					<th> Team </th>
-					<th></th>
+					<th class="center"> Player Stats </th>
+					<th class="center"> All Team Stats </th>
                   </tr>
                 </thead>
 				<tbody>
 				  <tr ng-repeat="d in playerInfoBody | filter:searchText track by $index ">
-					     <td ng-repeat="a in d track by $index" ng-if="[0,2,11].indexOf($index) > -1" style="width:30%">
+					     <td ng-repeat="a in d track by $index" ng-if="[2,11].indexOf($index) > -1">
 						{{a}}
 					</td>
-					<td style="width:100px">
-					     <button type="button" class="btn btn-default" ng-click="expandedStats(d)">Expanded Stats</button>
+					<td class="center">
+					     <button type="button" class="btn btn-default" ng-click="expandedStats(d)">
+							<span class="glyphicon glyphicon-user"> 
+						 </button> 
+					</td>
+					<td class="center">
+					     <button type="button" class="btn btn-default" ng-click="expandedStatsTeam(d)">
+							<span class="glyphicon glyphicon-tasks">
+						 </button>
 					</td>
 				  </tr>
 				  </tbody>

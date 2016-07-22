@@ -1,0 +1,62 @@
+
+<div class="modal-header">
+        <nav class="navbar navbar-default-modal style=background-color:#FFFFFF">
+            <div class="navbar-header">
+                <a class="brand" style="margin: 5px;">
+                    <img alt="{{teamname}}" style="margin-top:3px !important;" src='./Images/logobw.png'>
+                </a>
+            </div>
+            <div class="container-fluid">
+                <p class="navbar-text">NBA Player Predictions by Team <span ng-show="finished">- Game Against: <b>{{Opposition}}</b> {{l}} <b>{{Location}}</b> </span> </p>
+                <form class="navbar-form navbar-right" style="margin-right:10px" role="search">
+                    <div class="form-group has-feedback">
+                        <input type="text" class="form-control" ng-model="Opposition" placeholder="vs Team" />
+                        <i class="glyphicon glyphicon-user form-control-feedback"></i>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="text" class="form-control" placeholder="Home or Road" ng-model="Location" />
+                        <i class="glyphicon glyphicon-globe form-control-feedback" tooltip="Home or Road"></i>
+                    </div>
+                </form>
+            </div>
+        </nav>
+
+</div>
+
+<div class="modal-body">
+        <div class="container-fluid">
+            <div class="row">
+			  <div class="col-md-6 center">
+                           <div> <img src='./Images/teams/{{teamname}}_large.png' /> </div>                      
+              </div>
+			
+
+			 <div class="col-md-6">
+			    <table st-table="statsResults" class="table">
+					<thead>
+					  <th> Player Name </th>
+					  <th></th>
+					  <th> Predicted Score </th>
+					 </tr>
+					</thead>
+					<tbody>
+					   <tr ng-repeat="player in team.playerdetails track by $index">
+							<td>
+							  {{player.displayName}}
+							</td>
+							<td>
+							   <button type="submit"class="btn btn-default" ng-click="predict(player,Opposition,Location,$index)">Predict Me</button>
+							</td>
+							<td ng-show="player.predScore > 0">
+							  {{player.predScore}}
+							</td>
+					  </tr>
+					  </tbody>
+				</table>
+			</div>
+        </div>
+</div>
+</div>
+<div class="modal-footer modalFooterColor">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+</div>
