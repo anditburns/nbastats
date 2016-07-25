@@ -176,8 +176,27 @@
                        httpError.data;
               });	
 				
-	}
-    return APIService;
+	};
+
+	
+	
+	APIService.GetTeamSchedule = function(teamname){
+		return  $http.get('http://au.global.nba.com/stats2/team/schedule.json?countryCode=AU&locale=au&teamCode='+teamname)
+			.then(function(response)
+			{
+				return{response}
+			}, function (httpError) {
+				lu
+				
+                 // translate the error
+                 throw httpError.status + " : " + 
+                       httpError.data;
+              });	
+		
+	};
+	
+	
+	return APIService;
 }]);
 
 app.controller('SearchLogController', function ($scope, APIService, $uibModal) 
@@ -349,16 +368,29 @@ app.controller('TeamModalInstanceCtrl', function ($scope, $uibModalInstance, $sc
 		$uibModalInstance.dismiss('cancel');
 	};
 
+	
+		$scope.valid = true;
+	
 		var teamname = items[11];
 		$scope.teamname = items[11];
 		 APIService.GetAllPlayersOnTeam(teamname)
 			.then(function (data) {		
 				$scope.team = data.teamlist;	
+		}).then(function (data){
+			 APIService.GetTeamSchedule(teamname)
+			   .then(function (data){
+			   });
 		});
+		
+		
+		
+		
+		
+		
+		
 		
 		$scope.predict = function (player, opposition, loc, index)
 		{
-			
 			$scope.predictionMade = false;
 			$scope.Location = loc;
 			$scope.playerIndex = index;
@@ -367,11 +399,11 @@ app.controller('TeamModalInstanceCtrl', function ($scope, $uibModalInstance, $sc
 			$scope.playerId = player.playerid;
 			$scope.playerName = player.name_;
 	
-				APIService.GetTeamDetails(opposition)
+			APIService.GetTeamDetails(opposition)
 				.then(function (data)
 				{
-						$scope.op_conference = data.conf;
-						$scope.op_TeamId = data.teamId;
+					$scope.op_conference = data.conf;
+					$scope.op_TeamId = data.teamId;
 				}).then(function ()
 				{
 					APIService.GetGamesVsTeam($scope.playerId, $scope.op_TeamId)
@@ -411,7 +443,7 @@ app.controller('TeamModalInstanceCtrl', function ($scope, $uibModalInstance, $sc
 									homeorroad = data.onTheRoadAvg;
 								}
 								
-								$scope.team.playerdetails[$scope.playerIndex].predScore = ($scope.pointsAgainstTeam + $scope.pointsAgainstConference + data.last5Games + homeorroad) / 4;
+								$scope.team.playerdetails[$scope.playerIndex].predScore = Math.round(($scope.pointsAgainstTeam + $scope.pointsAgainstConference + data.last5Games + homeorroad) / 4);
 								
 									
 								});

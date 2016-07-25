@@ -24,12 +24,15 @@
 </div>
 
 <div class="modal-body">
-        <div class="container-fluid">
+        <div class="container-fluid" border ="1">
             <div class="row">
-			  <div class="col-md-6 center">
-                           <div> <img src='./Images/teams/{{teamname}}_large.png' /> </div>                      
-              </div>
+				  <div class="col-md-6 center">
+							   <div> <img src='./Images/teams/{{teamname}}_large.png' /> </div>                      
 			
+					  <div class="col-md-6 center">
+								   <div> <p> TEAM SCHEDULE </p> </div>                      
+					  </div>
+				</div>
 
 			 <div class="col-md-6">
 			    <table st-table="statsResults" class="table">
@@ -45,7 +48,7 @@
 							  {{player.displayName}}
 							</td>
 							<td>
-							   <button type="submit"class="btn btn-default" ng-click="predict(player,Opposition,Location,$index)">Predict Me</button>
+							   <button type="submit"class="btn btn-default" ng-click="predict(player,Opposition,Location,$index)" ng-disabled="!Opposition.length" >Predict Me</button>
 							</td>
 							<td ng-show="player.predScore > 0">
 							  {{player.predScore}}
