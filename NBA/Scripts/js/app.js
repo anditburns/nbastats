@@ -21,14 +21,14 @@
 		
 	APIService.GetCommonAllPlayers = function () {
         return $http.jsonp(urlBase + '/commonallplayers', {
-            params: {LeagueID:'00', Season:'2015-16', IsOnlyCurrentSeason:1, callback:'JSON_CALLBACK'}
+            params: {LeagueID:'00', Season:'2016-17', IsOnlyCurrentSeason:1, callback:'JSON_CALLBACK'}
         });
     }
 	
 	
 	APIService.GetAllPlayersOnTeam = function(teamname){
 		return $http.jsonp(urlBase + '/commonallplayers', {
-            params: {LeagueID:'00', Season:'2015-16', IsOnlyCurrentSeason:1, callback:'JSON_CALLBACK'}
+            params: {LeagueID:'00', Season:'2016-17', IsOnlyCurrentSeason:1, callback:'JSON_CALLBACK'}
         }).then(function (response) 
 			   {
 				var team = {
@@ -75,7 +75,7 @@
 	
 	APIService.GetGamesVsTeam = function (playerId, teamId) {
         return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
-            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:playerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:teamId, VsConference:'',VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'0', callback:'JSON_CALLBACK'}
+            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2016-17',SeasonType:'Regular Season',PORound:0,PlayerID:playerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:teamId, VsConference:'',VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:'0', callback:'JSON_CALLBACK'}
 		}).then(
 		    function(response) {
 				var ptsAverage = 0;
@@ -102,12 +102,12 @@
 	
 	APIService.GetGamesVsConference = function (playerId, op_conference) {
         return $http.jsonp(urlBase + '/playerdashboardbylastngames', {
-            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2015-16',SeasonType:'Regular Season',PORound:0,PlayerID:playerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:0,VsConference:op_conference,VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:0, callback:'JSON_CALLBACK'}
+            params: {MeasureType:'Base',PerMode:'PerGame',PlusMinus:'N',PaceAdjust:'N',Rank:'N',LeagueID:'00',Season:'2016-17',SeasonType:'Regular Season',PORound:0,PlayerID:playerId,Outcome:'',Location:'',Month:0,SeasonSegment:'',DateFrom:'',DateTo:'',OpponentTeamID:0,VsConference:op_conference,VsDivision:'',GameSegment:'',Period:0,ShotClockRange:'',LastNGames:0, callback:'JSON_CALLBACK'}
 		}).then(
 		    function(response) {
 				var ptsAverage = 0;
 				var numGames = 0;
-	
+
 				if (response.data == null || response.data.resultSets[0].rowSet.length == 0) 
 				{				
 					numGames = 0; 
@@ -125,6 +125,7 @@
     };
 	
 	APIService.GetTeamDetails = function(teamname){
+	
 		return $http.get('Data/teams.json').then(
 			function(response) {
 				var conference = '';
@@ -161,12 +162,12 @@
 				
 				if(response.data.payload.player.stats.playerSplit.splits.length > 0)  
 				{
+					
 					seasonAvg = response.data.payload.leagueSeasonAverage['pointsPg']; // we will sub this in if any stats come back empty
-					last5Games = response.data.payload.player.stats.playerSplit.splits[14].statAverage['pointsPg'];
-					inCurrentMonth = response.data.payload.player.stats.playerSplit.splits[15].statAverage['pointsPg'];
-					inPreviousMonth = response.data.payload.player.stats.playerSplit.splits[8].statAverage['pointsPg'];
-					onTheRoadAvg = response.data.payload.player.stats.playerSplit.splits[16].statAverage['pointsPg'];
-					atHome = response.data.payload.player.stats.playerSplit.splits[12].statAverage['pointsPg'];
+					last5Games = response.data.payload.player.stats.playerSplit.splits[5].statAverage['pointsPg'];
+					inCurrentMonth = response.data.payload.player.stats.playerSplit.splits[6].statAverage['pointsPg'];
+					onTheRoadAvg = response.data.payload.player.stats.playerSplit.splits[7].statAverage['pointsPg'];
+					atHome = response.data.payload.player.stats.playerSplit.splits[2].statAverage['pointsPg'];
 				}
 				return{ seasonAvg: seasonAvg, last5Games: last5Games, inCurrentMonth: inCurrentMonth, inPreviousMonth: inPreviousMonth, onTheRoadAvg: onTheRoadAvg, atHome: atHome}
 			},
@@ -184,7 +185,8 @@
 		return  $http.get('http://au.global.nba.com/stats2/team/schedule.json?countryCode=AU&locale=au&teamCode='+teamname)
 			.then(function(response)
 			{
-				return{response}
+			    return response;
+
 			}, function (httpError) {
 				lu
 				
@@ -270,11 +272,18 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 		{
 			$scope.JerseyNum =  data.resultSets[0].rowSet[0][13];	
 			$scope.Position = data.resultSets[0].rowSet[0][14];	
-			$scope.CareerPointsAvg = data.resultSets[1].rowSet[0][3];
-			$scope.PlayerId = data.resultSets[1].rowSet[0][0];
+			if(data.resultSets[1].rowSet.length > 0 ){
+				$scope.CareerPointsAvg = data.resultSets[1].rowSet[0][3];
+			}	
+			else{
+				$scope.CareerPointsAvg = 0;
+			}
+				
+			$scope.PlayerId = items[0];
+			
 		});			
 	}
-	
+	 
 	$scope.search = function () {
 		var found = false;
 		APIService.GetTeamDetails($scope.Opposition)
@@ -295,7 +304,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 
 					$scope.headers = data.headers;
 					$scope.playerInfoBody = data.body;
-					$scope.gamesPlayedT = data.gamesPlayed;
+					$scope.gamesPlayed = data.gamesPlayed;
 					$scope.finished = true;
 				});
 		});
@@ -318,7 +327,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 			 .then(function (data) 
 			{		
 				$scope.pointsAgainstConference = data.ptsAvg;
-				$scope.gamesPlayedC = data.gamesPlayed;			
+				$scope.gamesPlayedC = data.gamesPlayed;	
 			}).then(function ()
 			{
 				var pointsAverage = 0;
@@ -326,16 +335,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $sce, i
 				  .then(function (data)
 				  {
 					  var homeorroad = 0;
-					  if($scope.Location == "Home")
-						{
-							homeorroad = data.atHome;
-						}
-						else
-						{
-							homeorroad = data.onTheRoadAvg;
-						}
-						
-						if($scope.Location == "Home")
+					    if($scope.Location == "Home")
 						{
 							homeorroad = data.atHome;
 						}
@@ -368,7 +368,6 @@ app.controller('TeamModalInstanceCtrl', function ($scope, $uibModalInstance, $sc
 		$uibModalInstance.dismiss('cancel');
 	};
 
-	
 		$scope.valid = true;
 	
 		var teamname = items[11];
@@ -381,13 +380,6 @@ app.controller('TeamModalInstanceCtrl', function ($scope, $uibModalInstance, $sc
 			   .then(function (data){
 			   });
 		});
-		
-		
-		
-		
-		
-		
-		
 		
 		$scope.predict = function (player, opposition, loc, index)
 		{
@@ -444,8 +436,7 @@ app.controller('TeamModalInstanceCtrl', function ($scope, $uibModalInstance, $sc
 								}
 								
 								$scope.team.playerdetails[$scope.playerIndex].predScore = Math.round(($scope.pointsAgainstTeam + $scope.pointsAgainstConference + data.last5Games + homeorroad) / 4);
-								
-									
+	
 								});
 						  });
 						  
